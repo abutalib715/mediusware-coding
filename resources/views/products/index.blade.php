@@ -104,8 +104,8 @@
                 <div class="col-md-6">
                     <p>Showing {{ $products->firstItem() }} to {{ $products->lastItem() }} out of {{$products->total() }}</p>
                 </div>
-                <div class="col-md-2">
-                    
+                <div class="col-md-3">
+                    {{ $products->links() }}
                 </div>
             </div>
         </div>

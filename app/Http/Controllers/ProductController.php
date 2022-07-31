@@ -7,6 +7,7 @@ use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
 use App\Models\Variant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -76,7 +77,26 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
+//        $request->validate([
+//           ''
+//        ]);
+        DB::beginTransaction();
+        try {
+            $product = new Product();
+            $product->title = $request->title;
+            $product->sku = $request->sku;
+            $product->description = $request->description;
+            $product->save();
+            $_newID = $product->id;
 
+
+            DB::commit();
+            return response()->json(['status'=>'error','message'=>'Product Saved Successfully']);
+        } catch (\Exception $e){
+            DB::rollBack();
+            return response()->json(['status'=>'error','message'=>$e->getMessage()??'Failed to save product info']);
+        }
     }
 
 

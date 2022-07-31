@@ -11,11 +11,18 @@
         <form action="" method="get" class="card-header">
             <div class="form-row justify-content-between">
                 <div class="col-md-2">
-                    <input type="text" name="title" placeholder="Product Title" class="form-control">
+                    <input type="text" name="title" value="{{ request('title')??'' }}" placeholder="Product Title" class="form-control">
                 </div>
                 <div class="col-md-2">
                     <select name="variant" id="" class="form-control">
-
+                        <option value="">-- Select A Variant --</option>
+                        @foreach($product_variants as $key=>$variants)
+                        <optgroup label="{{ $key }}">
+                            @foreach($variants as $variant)
+                            <option value="{{ $variant }}" {{ request('variant')==$variant?'selected':'' }}>{{ $variant }}</option>
+                            @endforeach
+                        </optgroup>
+                        @endforeach
                     </select>
                 </div>
 
@@ -24,12 +31,12 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">Price Range</span>
                         </div>
-                        <input type="text" name="price_from" aria-label="First name" placeholder="From" class="form-control">
-                        <input type="text" name="price_to" aria-label="Last name" placeholder="To" class="form-control">
+                        <input type="text" name="price_from" value="{{ request('price_from')??'' }}" aria-label="Price From" placeholder="From" class="form-control">
+                        <input type="text" name="price_to" value="{{ request('price_to')??'' }}" aria-label="Price To" placeholder="To" class="form-control">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <input type="date" name="date" placeholder="Date" class="form-control">
+                    <input type="date" name="date" value="{{ request('date')??'' }}" placeholder="Date" class="form-control">
                 </div>
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-primary float-right"><i class="fa fa-search"></i></button>
@@ -60,7 +67,7 @@
                         <td>
                             <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant-{{ $loop->iteration }}">
                                 {{-- LOOPING OVER PRODUCT VARIANTS --}}
-                                @foreach($product->productVariantPrices() as $product_variant_price)
+                                @foreach($product->productVariantPrices as $product_variant_price)
                                     {{-- RETRIVING VARIANT DATA --}}
                                     @php
                                         $_variant = $product_variant_price->productVariantOne->variant??'';

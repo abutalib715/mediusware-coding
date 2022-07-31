@@ -15,10 +15,46 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::paginate(2);
-        return view('products.index',compact('products'));
+        $products = new Product();
+
+        //SEARCH IF SEARCH PARAMETER EXIST
+        if($request->title != ''){
+            $products = $products->where('title','like','%'.$request->title.'%');
+        }
+        if($request->price_from != ''){
+            $products = $products->whereHas('productVariantPrices',function($query) use($request){
+                $query->where('price','>=',$request->price_from);
+            });
+        }
+        if($request->price_to != ''){
+            $products = $products->whereHas('productVariantPrices',function($query) use($request){
+                $query->where('price','<=',$request->price_to);
+            });
+        }
+        if($request->variant != ''){
+            $products = $products->whereHas('productVariants',function($query) use($request){
+                $query->where('variant',$request->variant);
+            });
+        }
+        if($request->date != ''){
+            $products = $products->whereDate('created_at',$request->date);
+        }
+
+        //FINALLY GET PRODUCTS
+        $products = $products->paginate(2);
+
+        //GET VARIANT GROUPS
+        $_variants  = Variant::all();
+        //RETRIEVE PRODUCT VARIANTS
+        $product_variants = [];
+        foreach ($_variants as $_variant):
+            $product_variants[$_variant->title] = ProductVariant::where('variant_id',$_variant->id)
+                ->groupBy('variant')->pluck('variant')->toArray();
+        endforeach;
+
+        return view('products.index',compact('products','product_variants'));
     }
 
     /**

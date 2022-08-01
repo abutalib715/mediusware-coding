@@ -191,8 +191,15 @@ export default {
 
             axios.post('/product', product).then(response => {
                 console.log(response.data);
+                if(response.data.status == 'success'){
+                    alert(response.data.message);
+                    window.location.reload();
+                } else {
+                    alert(response.data.message);
+                }
             }).catch(error => {
                 console.log(error);
+                alert(error.message);
             })
 
             console.log(product);

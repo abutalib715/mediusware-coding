@@ -77,7 +77,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+//        dd($request->input());
 //        $request->validate([
 //           ''
 //        ]);
@@ -88,11 +88,41 @@ class ProductController extends Controller
             $product->sku = $request->sku;
             $product->description = $request->description;
             $product->save();
-            $_newID = $product->id;
+            $_new_product_id = $product->id;
 
+            //SAVING DATA IN PRODUCT VARIANT TABLE
+            foreach ($request->product_variant as $variant):
+                foreach ($variant['tags'] as $tag):
+                    $product_variant = new ProductVariant();
+                    $product_variant->variant = $tag;
+                    $product_variant->variant_id = $variant['option'];
+                    $product_variant->product_id = $_new_product_id;
+                    $product_variant->save();
+                endforeach;
+            endforeach;
+
+            //SAVING DATA IN PRODUCT VARIANT PRICES TABLE
+            foreach ($request->product_variant_prices as $pv_price):
+                //EXPLODING COMBINATION OF VARIANTS
+                $_titles = explode('/', $pv_price['title']);
+
+                $pro_variant_price = new ProductVariantPrice();
+
+                if(array_key_exists('0',$_titles))
+                    $pro_variant_price->product_variant_one = ProductVariant::where('variant',$_titles[0])->where('product_id',$_new_product_id)->first()->id??NULL;
+                if(array_key_exists('1',$_titles))
+                    $pro_variant_price->product_variant_two = ProductVariant::where('variant',$_titles[1])->where('product_id',$_new_product_id)->first()->id??NULL;
+                if(array_key_exists('2',$_titles))
+                    $pro_variant_price->product_variant_three = ProductVariant::where('variant',$_titles[2])->where('product_id',$_new_product_id)->first()->id??NULL;
+
+                $pro_variant_price->price = $pv_price['price'];
+                $pro_variant_price->stock = $pv_price['stock'];
+                $pro_variant_price->product_id = $_new_product_id;
+                $pro_variant_price->save();
+            endforeach;
 
             DB::commit();
-            return response()->json(['status'=>'error','message'=>'Product Saved Successfully']);
+            return response()->json(['status'=>'success','message'=>'Product Saved Successfully']);
         } catch (\Exception $e){
             DB::rollBack();
             return response()->json(['status'=>'error','message'=>$e->getMessage()??'Failed to save product info']);

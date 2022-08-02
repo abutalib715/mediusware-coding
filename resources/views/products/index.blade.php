@@ -69,9 +69,18 @@
                         <td>{{ $product->title }} <br> Created at : {{ date('d-M-Y',strtotime($product->created_at)) }}</td>
                         <td></td>
                         <td>
+                            @php
+                                $product_variant_prices = $product->productVariantPrices;
+                                if(request('price_from')!='')
+                                    $product_variant_prices = $product_variant_prices->where('price','>=',request('price_from'));
+                                if(request('price_to')!='')
+                                    $product_variant_prices = $product_variant_prices->where('price','<=',request('price_to'));
+
+
+                            @endphp
                             <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant-{{ $loop->iteration }}">
                                 {{-- LOOPING OVER PRODUCT VARIANTS --}}
-                                @foreach($product->productVariantPrices as $product_variant_price)
+                                @foreach($product_variant_prices as $product_variant_price)
                                     {{-- RETRIVING VARIANT DATA --}}
                                     @php
                                         $one = ($product_variant_price->product_variant_one != '')?$product_variant_price->productVariantOne->variant:'';

@@ -10,7 +10,7 @@
                         </div>
                         <div class="form-group">
                             <label for="">Product SKU</label>
-                            <input type="text" v-model="product_sku" placeholder="Product SKU" class="form-control">
+                            <input type="text" v-model="product_sku" placeholder="Product Name" class="form-control">
                         </div>
                         <div class="form-group">
                             <label for="">Description</label>
@@ -91,7 +91,7 @@
             </div>
         </div>
 
-        <button @click="saveProduct" type="submit" class="btn btn-lg btn-primary">Save</button>
+        <button @click="updateProduct" type="submit" class="btn btn-lg btn-primary">Save</button>
         <button type="button" class="btn btn-secondary btn-lg">Cancel</button>
     </section>
 </template>
@@ -107,6 +107,10 @@ export default {
         InputTag
     },
     props: {
+        product: {
+            type: Array,
+            required: true
+        },
         variants: {
             type: Array,
             required: true
@@ -114,9 +118,9 @@ export default {
     },
     data() {
         return {
-            product_name: '',
-            product_sku: '',
-            description: '',
+            product_name: this.product.title,
+            product_sku: this.product.sku,
+            description: this.product.description,
             images: [],
             product_variant: [
                 {
@@ -126,10 +130,11 @@ export default {
             ],
             product_variant_prices: [],
             dropzoneOptions: {
-                url: 'https://httpbin.org/post',
+                url: '/product',
                 thumbnailWidth: 150,
                 maxFilesize: 0.5,
-                headers: {"My-Awesome-Header": "header value"}
+                uploadMultiple: true,
+                autoProcessQueue: false,
             }
         }
     },
@@ -178,7 +183,8 @@ export default {
         },
 
         // store product into database
-        saveProduct() {
+        updateProduct() {
+            this.$refs.myVueDropzone.processQueue();
             let product = {
                 title: this.product_name,
                 sku: this.product_sku,
@@ -205,9 +211,9 @@ export default {
             console.log(product);
         }
 
-
     },
     mounted() {
+
         console.log('Component mounted.')
     }
 }

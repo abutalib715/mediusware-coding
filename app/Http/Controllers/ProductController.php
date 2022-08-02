@@ -77,7 +77,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-//        dd($request->input());
+//        dd($request->all());
 //        $request->validate([
 //           ''
 //        ]);
@@ -149,8 +149,9 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
+        $product = $product->with('productVariants','productVariantPrices');
         $variants = Variant::all();
-        return view('products.edit', compact('variants'));
+        return view('products.edit', compact('product','variants'));
     }
 
     /**

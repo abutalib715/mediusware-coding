@@ -1,7 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-
+<?php
+//    echo "<pre>";
+//    print_r($products[0]->productVariantPrices);
+//    die;
+?>
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Products</h1>
     </div>
@@ -70,9 +74,13 @@
                                 @foreach($product->productVariantPrices as $product_variant_price)
                                     {{-- RETRIVING VARIANT DATA --}}
                                     @php
-                                        $_variant = $product_variant_price->productVariantOne->variant??'';
-                                        $_variant .= '/ '.$product_variant_price->productVariantTwo->variant??'';
-                                        $_variant .= '/ '.$product_variant_price->productVariantTwo->variant??'';
+                                        $one = ($product_variant_price->product_variant_one != '')?$product_variant_price->productVariantOne->variant:'';
+                                        $two = ($product_variant_price->product_variant_two != '')?$product_variant_price->productVariantTwo->variant:'';
+                                        $three = ($product_variant_price->product_variant_three != '')?$product_variant_price->productVariantThree->variant:'';
+
+                                        $_variant = $one;
+                                        $_variant .= '/ '.$two;
+                                        $_variant .= '/ '.$three;
 
                                         $_price = $product_variant_price->price;
                                         $_stock = $product_variant_price->stock;
@@ -93,7 +101,7 @@
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{ route('product.edit', 1) }}" class="btn btn-success">Edit</a>
+                                <a href="{{ route('product.edit', $product->id) }}" class="btn btn-success">Edit</a>
                             </div>
                         </td>
                     </tr>

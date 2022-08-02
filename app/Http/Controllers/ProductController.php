@@ -147,9 +147,9 @@ class ProductController extends Controller
      * @param \App\Models\Product $product
      * @return \Illuminate\Http\Response
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
-        $product = $product->with('productVariants','productVariantPrices');
+        $product = Product::with('productVariants','productVariantPrices')->findOrFail($id);
         $variants = Variant::all();
         return view('products.edit', compact('product','variants'));
     }
